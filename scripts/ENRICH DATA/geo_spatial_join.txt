@@ -1,0 +1,32 @@
+CREATE TEMPORARY VIEW sellers_geo
+AS
+SELECT sellers.order_id, 
+geo_table.lat as seller_lat, 
+geo_table.lng as seller_lng
+FROM sellers
+LEFT JOIN geo_table
+ON sellers.seller_city = geo_table.city
+
+;
+
+CREATE TEMPORARY
+VIEW buyers_geo
+AS
+SELECT orders_general.order_id,
+    geo_table.lat as buyer_lat,
+    geo_table.lng as buyer_lng
+FROM orders_general
+    LEFT JOIN geo_table
+    ON LOWER (orders_general.customer_city) = geo_table.city
+
+;
+
+CREATE TEMPORARY 
+VIEW orders_coordinates
+SELECT 
+buyers_geo.order_id, 
+buyers_geo.buyer_lat, buyers_geo.buyer_lng,
+sellers_geo.seller_lat, sellers_geo.seller_lng
+FROM sellers_geo
+LEFT JOIN buyers_geo
+ON buyers_geo.order_id = sellers_geo.order_id
